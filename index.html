@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Biografi Komunitas</title>
+    
+    <!-- Memanggil File Manifest Resmi -->
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #ffffff; }
+        iframe { border: none; width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+
+    <!-- URL Aplikasi GAS Anda -->
+    <iframe src="https://script.google.com/macros/s/AKfycby1XauCHcP8WKdwqfxgYRXNsQM0-4paIagN3SHJ_lzUX3lkJ7V9D0IhoUXJhAofTaX1LA/exec"></iframe>
+
+    <script>
+        // Mendaftarkan File Service Worker Resmi
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then(() => console.log("Service Worker Terdaftar!"))
+            .catch(err => console.log("Gagal:", err));
+        }
+    </script>
+</body>
+</html>
