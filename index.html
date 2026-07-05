@@ -1,38 +1,29 @@
-<!-- ================================================================
-     index.html — DIGANTI dari iframe jadi REDIRECT LANGSUNG.
-     Karena halaman ini isinya cuma buat nampilin Web App doang (nggak
-     ada konten lain), redirect langsung SAMA SEKALI menghindari
-     masalah X-Frame-Options/CSP framing, karena browser nggak pernah
-     nyoba nge-frame apapun -- ini jadi navigasi biasa, bukan iframe.
-     ================================================================ -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Biografi Komunitas</title>
+    <title>Biografi</title>
+    
+    <!-- Memanggil File Manifest Resmi -->
     <link rel="manifest" href="manifest.json">
+
     <style>
-        body, html {
-            margin: 0; padding: 0; height: 100%;
-            background-color: #0f0f1a;
-            display: flex; align-items: center; justify-content: center;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #9ca3af; font-size: 14px;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #ffffff; }
+        iframe { border: none; width: 100%; height: 100%; }
     </style>
 </head>
 <body>
-    <p>Memuat biodata...</p>
-    <script>
-        // Redirect langsung (bukan iframe) -- ini yang menghilangkan
-        // masalah X-Frame-Options/CSP sepenuhnya untuk halaman ini.
-        window.location.replace("https://script.google.com/macros/s/AKfycby1XauCHcP8WKdwqfxgYRXNsQM0-4paIagN3SHJ_lzUX3lkJ7V9D0IhoUXJhAofTaX1LA/exec");
 
+    <!-- URL Aplikasi GAS Anda -->
+    <iframe src="https://script.google.com/macros/s/AKfycby1XauCHcP8WKdwqfxgYRXNsQM0-4paIagN3SHJ_lzUX3lkJ7V9D0IhoUXJhAofTaX1LA/exec"></iframe>
+
+    <script>
+        // Mendaftarkan File Service Worker Resmi
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
-                .then(() => console.log("Service Worker Terdaftar!"))
-                .catch(err => console.log("Gagal:", err));
+            .then(() => console.log("Service Worker Terdaftar!"))
+            .catch(err => console.log("Gagal:", err));
         }
     </script>
 </body>
