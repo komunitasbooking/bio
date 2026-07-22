@@ -14,11 +14,15 @@
     </style>
 </head>
 <body>
-
     <!-- URL Aplikasi GAS Anda -->
-    <iframe src="https://script.google.com/macros/s/AKfycby1XauCHcP8WKdwqfxgYRXNsQM0-4paIagN3SHJ_lzUX3lkJ7V9D0IhoUXJhAofTaX1LA/exec"></iframe>
-
+    <iframe id="bioFrame" src="https://script.google.com/macros/s/AKfycby1XauCHcP8WKdwqfxgYRXNsQM0-4paIagN3SHJ_lzUX3lkJ7V9D0IhoUXJhAofTaX1LA/exec"></iframe>
     <script>
+        // Teruskan query string (contoh: ?nama=sensen) dari wrapper ke GAS,
+        // supaya link dari Hall of Fame langsung buka halaman bio yang dimaksud.
+        const baseUrl = "https://script.google.com/macros/s/AKfycby1XauCHcP8WKdwqfxgYRXNsQM0-4paIagN3SHJ_lzUX3lkJ7V9D0IhoUXJhAofTaX1LA/exec";
+        const params  = window.location.search; // "" atau "?nama=sensen"
+        document.getElementById("bioFrame").src = baseUrl + params;
+
         // Mendaftarkan File Service Worker Resmi
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
