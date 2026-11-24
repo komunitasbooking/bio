@@ -40,7 +40,9 @@
         try {
             const s = KEY && localStorage.getItem(KEY);
             if (s) {
-                preview.srcdoc = s;
+                preview.srcdoc = s
+                .replace(/<script[\s\S]*?<\/script>/gi, "")   // buang skrip (toh tidak akan jalan)
+                .replace(/\son\w+="[^"]*"/gi, "");            // buang onclick/onmouseover dll.
                 preview.style.display = "block";
                 badge.style.display = "block";
                 loader.style.display = "none";
