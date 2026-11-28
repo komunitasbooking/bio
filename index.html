@@ -10,65 +10,53 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #0f0f1a; }
         iframe { border: none; width: 100%; height: 100%; position: absolute; inset: 0; background: #0f0f1a; }
-        #bioFrame { z-index: 1; }
-        #preview  { z-index: 2; display: none; }
-        #loader { position: absolute; inset: 0; z-index: 3; display: flex; align-items: center; justify-content: center; background: #0f0f1a; }
+        #loader { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: #0f0f1a; color: #c4b5fd; font: 14px -apple-system, "Segoe UI", sans-serif; text-align: center; padding: 0 24px; transition: opacity .25s; }
         .spin { width: 34px; height: 34px; border: 3px solid #4c1d95; border-top-color: #a78bfa; border-radius: 50%; animation: putar .8s linear infinite; }
         @keyframes putar { to { transform: rotate(360deg); } }
-        #badge { position: absolute; top: 8px; right: 8px; z-index: 4; display: none; font: 11px sans-serif; color: #c4b5fd; background: rgba(26,26,46,.92); border: 1px solid #4c1d95; padding: 4px 10px; border-radius: 999px; }
     </style>
 </head>
 <body>
-    <iframe id="preview" sandbox="" title="pratinjau"></iframe>
     <iframe id="bioFrame"></iframe>
-    <div id="loader"><div class="spin"></div></div>
-    <div id="badge">🔄 Memperbarui...</div>
+    <div id="loader"><div class="spin"></div><div id="loaderTeks">Memuat...</div></div>
 
     <script>
         const baseUrl = "https://script.google.com/macros/s/AKfycby1XauCHcP8WKdwqfxgYRXNsQM0-4paIagN3SHJ_lzUX3lkJ7V9D0IhoUXJhAofTaX1LA/exec";
         const params  = window.location.search;                       // "" atau "?nama=sensen"
         const nama    = new URLSearchParams(params).get("nama");
-        const KEY     = nama ? "cvSnap:" + nama.trim().toLowerCase() : null;
 
-        const frame   = document.getElementById("bioFrame");
-        const preview = document.getElementById("preview");
-        const loader  = document.getElementById("loader");
-        const badge   = document.getElementById("badge");
+        const frame  = document.getElementById("bioFrame");
+        const loader = document.getElementById("loader");
 
-        // 1. Tampilkan salinan terakhir kalau ada (tanpa script, hanya tampilan)
-        let adaSalinan = false;
+        document.getElementById("loaderTeks").textContent =
+            nama ? "Sedang mempersiapkan CV " + nama + "..." : "Memuat...";
+
+        // Bersihkan salinan lama dari versi sebelumnya (kalau ada)
         try {
-            const s = KEY && localStorage.getItem(KEY);
-            if (s) {
-                preview.srcdoc = s
-                .replace(/<script[\s\S]*?<\/script>/gi, "")   // buang skrip (toh tidak akan jalan)
-                .replace(/\son\w+="[^"]*"/gi, "");            // buang onclick/onmouseover dll.
-                preview.style.display = "block";
-                badge.style.display = "block";
-                loader.style.display = "none";
-                adaSalinan = true;
-            }
+            Object.keys(localStorage)
+                .filter(function (k) { return k.indexOf("cvSnap:") === 0; })
+                .forEach(function (k) { localStorage.removeItem(k); });
         } catch (e) {}
 
-        // 2. Muat CV asli di belakang
+        // Muat halaman asli (hanya satu kali)
         frame.src = baseUrl + params;
 
+        let siapSudah = false;
         function siap() {
-            preview.style.display = "none";
-            badge.style.display = "none";
-            loader.style.display = "none";
+            if (siapSudah) return;
+            siapSudah = true;
+            loader.style.opacity = "0";
+            setTimeout(function () { loader.style.display = "none"; }, 250);
         }
+
+        // Layar loading hilang begitu CV memberi kabar siap, atau saat iframe selesai dimuat
         frame.addEventListener("load", function () { setTimeout(siap, 300); });
         setTimeout(siap, 12000);   // jaring pengaman
 
-        // 3. Terima kabar & salinan terbaru dari halaman CV
         window.addEventListener("message", function (e) {
-            if (!/\.googleusercontent\.com$/.test(new URL(e.origin).hostname)) return;
-            const d = e.data || {};
-            if (d.type === "cv-ready") siap();
-            if (d.type === "cv-snapshot" && KEY && typeof d.html === "string" && d.html.length < 1500000) {
-                try { localStorage.setItem(KEY, d.html); } catch (err) {}
-            }
+            try {
+                if (!/\.googleusercontent\.com$/.test(new URL(e.origin).hostname)) return;
+            } catch (err) { return; }
+            if (e.data && e.data.type === "cv-ready") siap();
         });
 
         if ("serviceWorker" in navigator) {
